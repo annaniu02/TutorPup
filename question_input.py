@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from supabase_client import supabase 
 
 import home
 import help
@@ -15,9 +16,33 @@ BTNFONT =("Verdana", 35)
 class inputPage(tk.Frame):
     def __init__(self, parent, controller):
 
-        # TODO: adding user input question-answers to database when ADD button clicked
+        # Function to add user input question-answers to the database when ADD button is clicked
         def addToDatabase():
-            return
+            question = q_entry.get()
+            answer_a = a_entry.get()
+            answer_b = b_entry.get()
+            answer_c = c_entry.get()
+            correct_answer = correct_entry.get()
+
+            # Clear the entries after getting their values
+            q_entry.delete(0, tk.END)
+            a_entry.delete(0, tk.END)
+            b_entry.delete(0, tk.END)
+            c_entry.delete(0, tk.END)
+            correct_entry.delete(0, tk.END)
+
+            # Add data to Supabase
+            data = {
+                "Question": question,
+                "option_a": answer_a,
+                "option_b": answer_b,
+                "option_c": answer_c,
+                "correct_answer": correct_answer
+            }
+            response = supabase.table('question_bank').insert(data).execute()
+            print("Response:", response)  # For debugging
+
+
 
         tk.Frame.__init__(self, parent)
         
