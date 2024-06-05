@@ -14,9 +14,43 @@ MEDIUMFONT =("Verdana", 20)
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
+questionList = None
+
 # Question Display Page -- where the questions and answer choices 
 class displayPage(tk.Frame):
     def __init__(self, parent, controller):
+        def load_question(self):
+            response = supabase.table('question_bank').select('*').execute()
+            if response.status_code == 200:
+                questions = response.data
+                if questions:
+                    global questionList 
+                    questionList = questions
+                    curr_question = random.choice(questions)
+                    self.display_question_and_answers(curr_question)
+                else:
+                    print("No questions found in the database")
+            else:
+                print("Failed to fetch questions from the database")
+
+        def display_question_and_answers(self, question):
+            question_text = question['question']
+            answers = [question['option_a'], question['option_b'], question['option_c']]
+            random.shuffle(answers)
+
+            # Set button texts to shuffled answers
+            self.leftBtn.config(text=answers[0])
+            self.frontBtn.config(text=answers[1])
+            self.rightBtn.config(text=answers[2])
+
+            print(f"Question: {question_text}")
+            print(f"Left: {answers[0]}, Front: {answers[1]}, Right: {answers[2]}")
+
+            return (answers[0], answers[1], answers[2])
+    
+        def answer_question(self, question, user_answer):
+            return
+
         tk.Frame.__init__(self, parent)
         
         # Configure grid layout
@@ -51,17 +85,17 @@ class displayPage(tk.Frame):
         helpBtn.grid(row = 0, column = 5, padx = 10, pady = 10, sticky = tk.NE)
 
         # label of header
-        label = ttk.Label(self, text ="[display question here]",
+        question_label = ttk.Label(self, text ="[display question here]",
                           font = LARGEFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
         # putting the grid in its place by using grid
-        label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
+        question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
 
         # display answer choices randomly assigned to sensors [Left, Right, Front]
         left_label = ttk.Label(self, text="LEFT SENSOR:", font=MEDIUMFONT, background = "#f9cb9c")
         left_label.grid(row=1, column=0, padx=10, pady=10, sticky=tk.E)
         # TODO: button is placeholder --> question answer choices should be displayed once database is implemented
-        leftBtn = ttk.Button(self, text ="LEFT", style = 'btn.TButton',
+        left_answer = ttk.Label(self, text ="LEFT", style = 'btn.TButton',
                                 command = lambda : controller.show_frame(feedback.feedbackPage))
         leftBtn.grid(row = 1, column = 1)
 
@@ -82,29 +116,15 @@ class displayPage(tk.Frame):
         # instructions content
         instructions = ttk.Label(self, text = "Please indicate your answer by pressing the \ncorresponding sensor on the TutorPup",
                                               background='#f9cb9c', font = LARGEFONT, anchor = "center")
-        instructions.grid(row = 4, column = 0, columnspan = 6, rowspan = 2)
-    
-    def load_question(self):
-        response = supabase.table('question_bank').select('*').execute()
-        if response.status_code == 200:
-            questions = response.data
-            if questions:
-                question = random.choice(questions)
-                self.display_question_and_answers(question)
-            else:
-                print("No questions found in the database")
-        else:
-            print("Failed to fetch questions from the database")
+        instructions.grid(row = 4, column = 0, columnspan = 6, rowspan = 1)
 
-    def display_question_and_answers(self, question):
-        question_text = question['question']
-        answers = [question['option_a'], question['option_b'], question['option_c']]
-        random.shuffle(answers)
-
-        # Set button texts to shuffled answers
-        self.leftBtn.config(text=answers[0])
-        self.frontBtn.config(text=answers[1])
-        self.rightBtn.config(text=answers[2])
-
-        print(f"Question: {question_text}")
-        print(f"Left: {answers[0]}, Front: {answers[1]}, Right: {answers[2]}")
+        # answer buttons -- PLACEHOLDER
+        leftBtn = ttk.Button(self, text ="LEFT", style = 'btn.TButton',
+                                command = lambda : controller.show_frame(feedback.feedbackPage))
+        leftBtn.grid(row = 5, column = 0, columnspan = 2)
+        frontBtn = ttk.Button(self, text ="FRONT", style = 'btn.TButton',
+                                command = lambda : controller.show_frame(feedback.feedbackPage))
+        frontBtn.grid(row = 5, column = 2, columnspan = 2)
+        rightBtn = ttk.Button(self, text ="RIGHT", style = 'btn.TButton',
+                                command = lambda : controller.show_frame(feedback.feedbackPage))
+        rightBtn.grid(row = 5, column = 4, columnspan = 2)
