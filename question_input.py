@@ -24,12 +24,29 @@ class inputPage(tk.Frame):
             answer_c = c_entry.get()
             correct_answer = correct_entry.get()
 
+            if correct_answer == 'A':
+                correct_answer_text = answer_a
+            elif correct_answer == 'B':
+                correct_answer_text = answer_b
+            elif correct_answer == 'C':
+                correct_answer_text = answer_c
+            
+            # Add data to Supabase
+            data = {
+                "Question": question,
+                "option_a": answer_a,
+                "option_b": answer_b,
+                "option_c": answer_c,
+                "correct_answer": correct_answer_text
+            }
+            
             # Clear the entries after getting their values
             q_entry.delete(0, tk.END)
             a_entry.delete(0, tk.END)
             b_entry.delete(0, tk.END)
             c_entry.delete(0, tk.END)
             correct_entry.delete(0, tk.END)
+
 
             # Add data to Supabase
             data = {
