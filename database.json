@@ -1,0 +1,10 @@
+[
+    {
+        "question": "What are the two general categories of human-robot interaction (HRI)?",
+        "option_a": "Visual and Auditory Interaction",
+        "option_b": "Remote and Proximate Interaction",
+        "option_c": "Physical and Virtual Interaction",
+        "correct_answer": "Remote and Proximate Interaction",
+        "status": "FALSE"
+    }
+]

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from supabase_client import supabase
+from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
@@ -16,32 +16,8 @@ BTNFONT =("Verdana", 35)
 # Finish Page -- once all questions have been answered correctly, can choose to either RESET (input new questions) or REPLAY (replay question deck)
 class finishPage(tk.Frame):
     def __init__(self, parent, controller):
-
-        # TODO: reset database
-        def resetDatabase(self):
-            response = supabase.table('question_bank').select('*').execute()
-            if response.status_code == 200:
-                questions = response.data
-                if questions:
-                    ids_to_delete = [question['id'] for question in questions[1:]]
-                
-                    for id_to_delete in ids_to_delete:
-                        supabase.table('question_bank').delete().eq('id', id_to_delete).execute()
-                    print("Database reset. Only the first row is kept.")
-                else:
-                    print("No questions found in the database.")
-            else:
-                print("Failed to fetch questions from the database.")
-
-            self.controller.show_frame(question_input.inputPage)
-            return
-        
-        # TODO: replay database
-        def replayDatabase(self):
-            self.controller.show_frame(question_display.displayPage)
-            return
-    
         tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -92,12 +68,34 @@ class finishPage(tk.Frame):
         # TODO: after RESET button clicked, database should be cleared
         # TODO: do we want screen where user can review questions currently in database?
         resetBtn = ttk.Button(self, text ="RESET", style = 'btn.TButton',
-                                command = resetDatabase)
+                                command = self.resetDatabase)
         resetBtn.grid(row = 5, column = 0, columnspan = 3, rowspan = 1)
 
         # Place REPLAY button to move to question display slides
         # TODO: connect this functionality to database
         # TODO: after REPLAY button clicked, all questions in database should be run through and answered again --> status of questions back to 'incorrect'
         replayBtn = ttk.Button(self, text ="REPLAY", style = 'btn.TButton',
-                                command = replayDatabase)
+                                command = self.replayDatabase)
         replayBtn.grid(row = 5, column = 3, columnspan = 3, rowspan = 1)
+    
+    # TODO: reset database
+    def resetDatabase(self):
+        questions = read_questions_from_file()
+        if questions:
+            questions_to_keep = [questions[0]]  # Keep only the first question
+            write_questions_to_file(questions_to_keep)
+            print("Database reset. Only the first row is kept.")
+        else:
+            print("No questions found in the JSON file.")
+
+        self.controller.show_frame(question_input.inputPage)
+        return
+        
+    # TODO: replay database
+    def replayDatabase(self):
+        questions = read_questions_from_file()
+        for question in questions:
+            question['status'] = 'FALSE'
+        write_questions_to_file(questions)
+        self.controller.show_frame(question_display.displayPage)
+        return

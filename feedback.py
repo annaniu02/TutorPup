@@ -1,8 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
+from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
+import question_display
 import question_input
 import question_display
 import finish
@@ -50,28 +52,67 @@ class feedbackPage(tk.Frame):
         helpBtn.grid(row = 0, column = 5, padx = 10, pady = 10, sticky = tk.NE)
 
         # label of header
-        label = ttk.Label(self, text ="[display question here]",
+        self.question_label = ttk.Label(self, text ="[display question here]",
                           font = LARGEFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
         # putting the grid in its place by using grid
-        label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
+        self.question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
 
         # TODO: this should change depending on if the correct sensor was pressed or not
-        feedback = ttk.Label(self, text ="CORRECT/INCORRECT",
+        self.feedback = ttk.Label(self, text ="CORRECT/INCORRECT",
                              font = HEADERFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
         # putting the grid in its place by using grid
-        feedback.grid(row = 1, column = 0, columnspan = 6, rowspan = 2)
+        self.feedback.grid(row = 1, column = 0, columnspan = 6, rowspan = 2)
 
         # correction content
         # TODO: this should change depending on what the correct answer & associated sensor is
-        correction = ttk.Label(self, text ="Correct Answer is: [Left:________]",
+        self.correction = ttk.Label(self, text ="Correct Answer is: [Left:________]",
                                font = LARGEFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
-        correction.grid(row = 3, column = 0, columnspan = 6, rowspan = 2)
+        self.correction.grid(row = 3, column = 0, columnspan = 6, rowspan = 2)
         
         # Place CONTINUE button to move to next question display slide
         # TODO: normally should display next question, for now have it go to finish page
         continueBtn = ttk.Button(self, text ="CONTINUE", style = 'btn.TButton',
                                 command = lambda : controller.show_frame(finish.finishPage))
         continueBtn.grid(row = 5, column = 0, columnspan = 6, rowspan = 1)
+    
+    def update_feedback(self, question, user_answer, selected_sensor):
+        correct_answer = question['correct_answer']
+        is_correct = user_answer == correct_answer
+
+        # Update question label
+        self.question_label.config(text=question['question'])
+
+        # Update feedback label
+        if is_correct:
+            self.feedback.config(text="CORRECT")
+            question['status'] = 'TRUE'
+            self.update_question_status(question)
+        else:
+            self.feedback.config(text="INCORRECT")
+
+
+        self.correction.config(text=f"Correct Answer is: [{selected_sensor}: {correct_answer}]")
+        self.current_question = question
+        self.is_correct = is_correct
+
+    def update_question_status(self, updated_question):
+        questions = read_questions_from_file()
+        for q in questions:
+            if q['question'] == updated_question['question']:
+                q['status'] = updated_question['status']
+                break
+        write_questions_to_file(questions)
+    
+    def continue_to_next_question(self):
+        if not self.is_correct:
+            # Rotate the question to the back if answered incorrectly
+            self.controller.frames[question_display].questions.append(
+                self.controller.frames[question_display].questions.pop(self.controller.frames[question_display].current_question_index)
+            )
+
+        # Load the next question
+        self.controller.frames[question_display].load_question()
+        self.controller.show_frame(question_display)

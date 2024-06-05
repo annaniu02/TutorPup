@@ -1,58 +1,85 @@
 import tkinter as tk
 from tkinter import ttk
 import random
-from supabase_client import supabase 
+from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
 import feedback
+import finish
 import question_input
 
 HEADERFONT = ("Verdana", 40)
 LARGEFONT =("Verdana", 30)
 MEDIUMFONT =("Verdana", 20)
+MEDIUMBOLDFONT = ("Verdana", 20, "bold")
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
 questionList = None
 
+current_question_index = None
+current_question = None
+
+question_text = None
+answer_one = None
+answer_two = None
+answer_three = None
+
+answer_to_sensor = None
+
 # Question Display Page -- where the questions and answer choices 
 class displayPage(tk.Frame):
     def __init__(self, parent, controller):
-        def load_question(self):
-            response = supabase.table('question_bank').select('*').execute()
-            if response.status_code == 200:
-                questions = response.data
-                if questions:
-                    global questionList 
-                    questionList = questions
-                    curr_question = random.choice(questions)
-                    self.display_question_and_answers(curr_question)
-                else:
-                    print("No questions found in the database")
-            else:
-                print("Failed to fetch questions from the database")
+        tk.Frame.__init__(self, parent)
 
-        def display_question_and_answers(self, question):
+        def load_question():
+            questionList = read_questions_from_file()
+            if not questionList or all(q['status'] == 'TRUE' for q in questionList):
+                return
+    
+            global current_question_index
+            current_question_index = 0
+            while questionList[current_question_index]['status'] == 'TRUE':
+                self.current_question_index = (current_question_index + 1) % len(self.questions)
+        
+            global current_question
+            current_question = questionList[current_question_index]
+            display_question_and_answers(current_question)
+            
+
+
+        def display_question_and_answers(question):
+            global question_text 
             question_text = question['question']
             answers = [question['option_a'], question['option_b'], question['option_c']]
             random.shuffle(answers)
 
-            # Set button texts to shuffled answers
-            self.leftBtn.config(text=answers[0])
-            self.frontBtn.config(text=answers[1])
-            self.rightBtn.config(text=answers[2])
+            global answer_one
+            answer_one = answers[0]
+
+            global answer_two
+            answer_two = answers[1]
+
+            global answer_three
+            answer_three = answers[2]
+           
+            global answer_to_sensor
+            answer_to_sensor = {
+                'Left': answers[0],
+                'Front': answers[1],
+                'Right': answers[2]
+            }
 
             print(f"Question: {question_text}")
             print(f"Left: {answers[0]}, Front: {answers[1]}, Right: {answers[2]}")
 
-            return (answers[0], answers[1], answers[2])
-    
-        def answer_question(self, question, user_answer):
-            return
-
-        tk.Frame.__init__(self, parent)
+        def answer_question(selected_sensor):
+            user_answer= answer_to_sensor[selected_sensor]
+            controller.frames[feedback.feedbackPage].update_feedback(current_question, user_answer, selected_sensor)
+            controller.show_frame(feedback.feedbackPage)
         
+        load_question()
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
@@ -85,33 +112,39 @@ class displayPage(tk.Frame):
         helpBtn.grid(row = 0, column = 5, padx = 10, pady = 10, sticky = tk.NE)
 
         # label of header
-        question_label = ttk.Label(self, text ="[display question here]",
+        question_label = ttk.Label(self, text = question_text,
                           font = LARGEFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
         # putting the grid in its place by using grid
         question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
 
         # display answer choices randomly assigned to sensors [Left, Right, Front]
-        left_label = ttk.Label(self, text="LEFT SENSOR:", font=MEDIUMFONT, background = "#f9cb9c")
+        left_label = ttk.Label(self, text="LEFT SENSOR:", font=MEDIUMBOLDFONT, background = "#f9cb9c")
         left_label.grid(row=1, column=0, padx=10, pady=10, sticky=tk.E)
         # TODO: button is placeholder --> question answer choices should be displayed once database is implemented
-        left_answer = ttk.Label(self, text ="LEFT", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(feedback.feedbackPage))
-        leftBtn.grid(row = 1, column = 1)
+        # leftBtn = ttk.Label(self, text ="LEFT", style = 'btn.TButton',
+        #                         command = lambda : controller.show_frame(feedback.feedbackPage))
+        # leftBtn.grid(row = 1, column = 1)
+        left_answer = ttk.Label(self, text=answer_one, font=MEDIUMFONT, background="#f9cb9c")
+        left_answer.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
 
-        front_label = ttk.Label(self, text="FRONT SENSOR:", font=MEDIUMFONT, background = "#f9cb9c")
+        front_label = ttk.Label(self, text="FRONT SENSOR:", font=MEDIUMBOLDFONT, background = "#f9cb9c")
         front_label.grid(row=2, column=0, padx=10, pady=10, sticky=tk.E)
         # TODO: button is placeholder --> question answer choices should be displayed once database is implemented
-        frontBtn = ttk.Button(self, text ="FRONT", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(feedback.feedbackPage))
-        frontBtn.grid(row = 2, column = 1)
+        # frontBtn = ttk.Button(self, text ="FRONT", style = 'btn.TButton',
+        #                         command = lambda : controller.show_frame(feedback.feedbackPage))
+        # frontBtn.grid(row = 2, column = 1)
+        front_answer = ttk.Label(self, text=answer_two, font=MEDIUMFONT, background="#f9cb9c")
+        front_answer.grid(row=2, column=1, padx=10, pady=10, sticky=tk.W)
 
-        right_label = ttk.Label(self, text="RIGHT SENSOR:", font=MEDIUMFONT, background = "#f9cb9c")
+        right_label = ttk.Label(self, text="RIGHT SENSOR:", font=MEDIUMBOLDFONT, background = "#f9cb9c")
         right_label.grid(row=3, column=0, padx=10, pady=10, sticky=tk.E)
         # TODO: button is placeholder --> question answer choices should be displayed once database is implemented
-        rightBtn = ttk.Button(self, text ="RIGHT", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(feedback.feedbackPage))
-        rightBtn.grid(row = 3, column = 1)
+        # rightBtn = ttk.Button(self, text ="RIGHT", style = 'btn.TButton',
+        #                         command = lambda : controller.show_frame(feedback.feedbackPage))
+        # rightBtn.grid(row = 3, column = 1)
+        right_answer = ttk.Label(self, text=answer_three, font=MEDIUMFONT, background="#f9cb9c")
+        right_answer.grid(row=3, column=1, padx=10, pady=10, sticky=tk.W)
 
         # instructions content
         instructions = ttk.Label(self, text = "Please indicate your answer by pressing the \ncorresponding sensor on the TutorPup",
@@ -120,11 +153,12 @@ class displayPage(tk.Frame):
 
         # answer buttons -- PLACEHOLDER
         leftBtn = ttk.Button(self, text ="LEFT", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(feedback.feedbackPage))
+                                command = lambda : answer_question('Left'))
         leftBtn.grid(row = 5, column = 0, columnspan = 2)
         frontBtn = ttk.Button(self, text ="FRONT", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(feedback.feedbackPage))
+                                command = lambda : answer_question('Front'))
         frontBtn.grid(row = 5, column = 2, columnspan = 2)
         rightBtn = ttk.Button(self, text ="RIGHT", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(feedback.feedbackPage))
+                                command = lambda : answer_question('Right'))
         rightBtn.grid(row = 5, column = 4, columnspan = 2)
+    

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from supabase_client import supabase 
+from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
@@ -31,14 +31,19 @@ class inputPage(tk.Frame):
             elif correct_answer == 'C':
                 correct_answer_text = answer_c
             
-            # Add data to Supabase
+            questions = read_questions_from_file()
+
             data = {
-                "Question": question,
+                "question": question,
                 "option_a": answer_a,
                 "option_b": answer_b,
                 "option_c": answer_c,
-                "correct_answer": correct_answer_text
+                "correct_answer": correct_answer_text,
+                "status": "FALSE"
             }
+
+            questions.append(data)
+            write_questions_to_file(questions)
             
             # Clear the entries after getting their values
             q_entry.delete(0, tk.END)
@@ -48,16 +53,7 @@ class inputPage(tk.Frame):
             correct_entry.delete(0, tk.END)
 
 
-            # Add data to Supabase
-            data = {
-                "Question": question,
-                "option_a": answer_a,
-                "option_b": answer_b,
-                "option_c": answer_c,
-                "correct_answer": correct_answer
-            }
-            response = supabase.table('question_bank').insert(data).execute()
-            print("Response:", response)  # For debugging
+            print("Question added:", data)  
 
 
 
