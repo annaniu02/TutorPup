@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+import random
+from supabase_client import supabase 
 
 import home
 import help
@@ -81,3 +83,28 @@ class displayPage(tk.Frame):
         instructions = ttk.Label(self, text = "Please indicate your answer by pressing the \ncorresponding sensor on the TutorPup",
                                               background='#f9cb9c', font = LARGEFONT, anchor = "center")
         instructions.grid(row = 4, column = 0, columnspan = 6, rowspan = 2)
+    
+    def load_question(self):
+        response = supabase.table('question_bank').select('*').execute()
+        if response.status_code == 200:
+            questions = response.data
+            if questions:
+                question = random.choice(questions)
+                self.display_question_and_answers(question)
+            else:
+                print("No questions found in the database")
+        else:
+            print("Failed to fetch questions from the database")
+
+    def display_question_and_answers(self, question):
+        question_text = question['question']
+        answers = [question['option_a'], question['option_b'], question['option_c']]
+        random.shuffle(answers)
+
+        # Set button texts to shuffled answers
+        self.leftBtn.config(text=answers[0])
+        self.frontBtn.config(text=answers[1])
+        self.rightBtn.config(text=answers[2])
+
+        print(f"Question: {question_text}")
+        print(f"Left: {answers[0]}, Front: {answers[1]}, Right: {answers[2]}")

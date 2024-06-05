@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from supabase_client import supabase
 
 import home
 import help
@@ -17,13 +18,27 @@ class finishPage(tk.Frame):
     def __init__(self, parent, controller):
 
         # TODO: reset database
-        def resetDatabase():
-            controller.show_frame(question_input.inputPage)
+        def resetDatabase(self):
+            response = supabase.table('question_bank').select('*').execute()
+            if response.status_code == 200:
+                questions = response.data
+                if questions:
+                    ids_to_delete = [question['id'] for question in questions[1:]]
+                
+                    for id_to_delete in ids_to_delete:
+                        supabase.table('question_bank').delete().eq('id', id_to_delete).execute()
+                    print("Database reset. Only the first row is kept.")
+                else:
+                    print("No questions found in the database.")
+            else:
+                print("Failed to fetch questions from the database.")
+
+            self.controller.show_frame(question_input.inputPage)
             return
         
         # TODO: replay database
-        def replayDatabase():
-            controller.show_frame(question_display.displayPage)
+        def replayDatabase(self):
+            self.controller.show_frame(question_display.displayPage)
             return
     
         tk.Frame.__init__(self, parent)
