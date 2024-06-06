@@ -5,7 +5,8 @@ from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
-import feedback
+import feedback_correct
+import feedback_incorrect
 import finish
 import question_input
 
@@ -16,7 +17,8 @@ MEDIUMBOLDFONT = ("Verdana", 20, "bold")
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
-questionList = None
+global questionList
+questionList = read_questions_from_file()
 
 current_question_index = None
 current_question = None
@@ -34,20 +36,17 @@ class displayPage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         def load_question():
-            questionList = read_questions_from_file()
-            if not questionList or all(q['status'] == 'TRUE' for q in questionList):
-                return
-    
             global current_question_index
             current_question_index = 0
             while questionList[current_question_index]['status'] == 'TRUE':
-                self.current_question_index = (current_question_index + 1) % len(self.questions)
+                current_question_index = (current_question_index + 1) % len(questionList)
         
+            print(current_question_index)
+            
             global current_question
             current_question = questionList[current_question_index]
             display_question_and_answers(current_question)
-            
-
+        
 
         def display_question_and_answers(question):
             global question_text 
@@ -74,12 +73,36 @@ class displayPage(tk.Frame):
             print(f"Question: {question_text}")
             print(f"Left: {answers[0]}, Front: {answers[1]}, Right: {answers[2]}")
 
-        def answer_question(selected_sensor):
-            user_answer= answer_to_sensor[selected_sensor]
-            controller.frames[feedback.feedbackPage].update_feedback(current_question, user_answer, selected_sensor)
-            controller.show_frame(feedback.feedbackPage)
-        
+        def update_question_status(updated_question):
+            questions = read_questions_from_file()
+            for q in questions:
+                if q['question'] == updated_question['question']:
+                    q['status'] = updated_question['status']
+                    break
+            write_questions_to_file(questions)
+
+
+        def answer_question(user_answer):
+            correct_answer = current_question['correct_answer']
+            is_correct = user_answer == correct_answer
+
+            if is_correct:
+                feedback = "CORRECT"
+                current_question['status'] = 'TRUE'
+                update_question_status(current_question)
+                controller.frames[feedback_correct.feedbackCorrectPage].update_feedback(current_question, "CORRECT", current_question['correct_answer'])
+                # feedback_correct.feedbackCorrectPage.update_feedback(current_question, feedback, correct_answer)
+                controller.show_frame(feedback_correct.feedbackCorrectPage)
+            else:
+                feedback = "INCORRECT"
+                questionList.append(questionList.pop(current_question_index))
+                controller.frames[feedback_incorrect.feedbackIncorrectPage].update_feedback(current_question, "INCORRECT", current_question['correct_answer'])
+                #feedback_incorrect.feedbackIncorrectPage.update_feedback(current_question, feedback, correct_answer)
+                controller.show_frame(feedback_incorrect.feedbackIncorrectPage)
+
+
         load_question()
+
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
@@ -153,12 +176,12 @@ class displayPage(tk.Frame):
 
         # answer buttons -- PLACEHOLDER
         leftBtn = ttk.Button(self, text ="LEFT", style = 'btn.TButton',
-                                command = lambda : answer_question('Left'))
+                                command = lambda : answer_question(left_answer.cget("text")))
         leftBtn.grid(row = 5, column = 0, columnspan = 2)
         frontBtn = ttk.Button(self, text ="FRONT", style = 'btn.TButton',
-                                command = lambda : answer_question('Front'))
+                                command = lambda : answer_question(front_answer.cget("text")))
         frontBtn.grid(row = 5, column = 2, columnspan = 2)
         rightBtn = ttk.Button(self, text ="RIGHT", style = 'btn.TButton',
-                                command = lambda : answer_question('Right'))
+                                command = lambda : answer_question(right_answer.cget("text")))
         rightBtn.grid(row = 5, column = 4, columnspan = 2)
     

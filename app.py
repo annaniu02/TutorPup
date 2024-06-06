@@ -4,7 +4,8 @@ from home import homePage
 from help import helpPage
 from question_input import inputPage
 from question_display import displayPage
-from feedback import feedbackPage
+from feedback_correct import feedbackCorrectPage
+from feedback_incorrect import feedbackIncorrectPage
 from finish import finishPage
  
 LARGEFONT =("Verdana", 35)
@@ -31,7 +32,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (homePage, helpPage, inputPage, displayPage, feedbackPage, finishPage):
+        for F in (homePage, helpPage, inputPage, displayPage, feedbackCorrectPage, feedbackIncorrectPage, finishPage):
   
             frame = F(container, self)
   
