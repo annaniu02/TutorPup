@@ -17,28 +17,32 @@ BTNFONT =("Verdana", 35)
 class finishPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         # TODO: reset database
-        def resetDatabase():
-            questions = read_questions_from_file()
-            if questions:
-                questions_to_keep = [questions[0]]  # Keep only the first question
-                write_questions_to_file(questions_to_keep)
-                print("Database reset. Only the first row is kept.")
-            else:
-                print("No questions found in the JSON file.")
+        # def resetDatabase():
+        #     questions = read_questions_from_file()
+        #     if questions:
+        #         questions_to_keep = [questions[0]]
+        #         questions_to_keep[0]['status'] = 'FALSE'
+        #         write_questions_to_file(questions_to_keep)
+        #         print("Database reset. Only the first row is kept.")
+        #     else:
+        #         print("No questions found in the JSON file.")
 
-            controller.show_frame(question_input.inputPage)
-            return
+        #     controller.show_frame(question_input.inputPage)
             
         # TODO: replay database
-        def replayDatabase():
-            questions = read_questions_from_file()
-            for question in questions:
-                question['status'] = 'FALSE'
-            write_questions_to_file(questions)
-            controller.show_frame(question_display.displayPage)
-            return
+        # def replayDatabase():
+        #     questions = read_questions_from_file()
+        #     for question in questions:
+        #         question['status'] = 'FALSE'
+        #     write_questions_to_file(questions)
+        #     print(question_display.displayPage.current_question_index)
+        #     question_display.displayPage.current_question_index = 0
+        #     print(question_display.displayPage.current_question_index)
+        #     # controller.frames[question_display.displayPage].load_question()
+        #     controller.show_frame(question_display.displayPage)
 
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -89,12 +93,36 @@ class finishPage(tk.Frame):
         # TODO: after RESET button clicked, database should be cleared
         # TODO: do we want screen where user can review questions currently in database?
         resetBtn = ttk.Button(self, text ="RESET", style = 'btn.TButton',
-                                command = resetDatabase)
+                                command = self.resetDatabase)
         resetBtn.grid(row = 5, column = 0, columnspan = 3, rowspan = 1)
 
         # Place REPLAY button to move to question display slides
         # TODO: connect this functionality to database
         # TODO: after REPLAY button clicked, all questions in database should be run through and answered again --> status of questions back to 'incorrect'
         replayBtn = ttk.Button(self, text ="REPLAY", style = 'btn.TButton',
-                                command = replayDatabase)
+                                command = self.replayDatabase)
         replayBtn.grid(row = 5, column = 3, columnspan = 3, rowspan = 1)
+
+    def resetDatabase(self):
+        questions = read_questions_from_file()
+        if questions:
+            questions_to_keep = [questions[0]]  # Keep only the first question
+            questions_to_keep[0]['status'] = 'FALSE'
+            write_questions_to_file(questions_to_keep)
+            print("Database reset. Only the first row is kept.")
+        else:
+            print("No questions found in the JSON file.")
+
+        self.controller.show_frame(question_input.inputPage)
+            
+    # TODO: replay database
+    def replayDatabase(self):
+        questions = read_questions_from_file()
+        for question in questions:
+            question['status'] = 'FALSE'
+        write_questions_to_file(questions)
+        print(question_display.displayPage.current_question_index)
+        question_display.displayPage.current_question_index = 0
+        print(question_display.displayPage.current_question_index)
+        self.controller.frames[question_display.displayPage].load_question()
+        self.controller.show_frame(question_display.displayPage)

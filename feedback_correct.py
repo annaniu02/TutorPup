@@ -18,6 +18,8 @@ questionList = None
 # Feedback Page -- once user answer question by pressing corresponding sensor, this page displays to say if answer is right or wrong
 class feedbackCorrectPage(tk.Frame):
     def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         def update_feedback(question, feedback, correct_answer):
             question_label.config(text=question['question'])
@@ -33,11 +35,10 @@ class feedbackCorrectPage(tk.Frame):
                 controller.show_frame(finish.finishPage)
             else:
                 # Load the next question
-                # question_display.load_question()
+                #question_display.load_question()
+                # controller.show_frame(question_display.displayPage)
+                controller.frames[question_display.displayPage].load_question()
                 controller.show_frame(question_display.displayPage)
-
-
-        tk.Frame.__init__(self, parent)
         
         
         # Configure grid layout

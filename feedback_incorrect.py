@@ -28,13 +28,8 @@ class feedbackIncorrectPage(tk.Frame):
         self.update_feedback = update_feedback
 
         def continue_to_next_question():
-            questionList = read_questions_from_file()
-            if all(q['status'] == 'TRUE' for q in questionList):
-                controller.show_frame(finish.finishPage)
-            else:
-                # Load the next question
-                # question_display.load_question()
-                controller.show_frame(question_display.displayPage)
+            controller.frames[question_display.displayPage].load_question()
+            controller.show_frame(question_display.displayPage)
         
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
