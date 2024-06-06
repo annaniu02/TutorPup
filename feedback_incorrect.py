@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help

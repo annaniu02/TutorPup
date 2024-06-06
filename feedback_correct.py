@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
@@ -19,7 +18,7 @@ questionList = None
 class feedbackCorrectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
+        
 
         def update_feedback(question, feedback, correct_answer):
             question_label.config(text=question['question'])
@@ -30,13 +29,11 @@ class feedbackCorrectPage(tk.Frame):
 
        
         def continue_to_next_question():
-            questionList = read_questions_from_file()
-            if all(q['status'] == 'TRUE' for q in questionList):
+            if all(q['status'] == 'TRUE' for q in question_display.displayPage.questions):
                 controller.show_frame(finish.finishPage)
             else:
                 # Load the next question
-                #question_display.load_question()
-                # controller.show_frame(question_display.displayPage)
+                # question_display.displayPage.load_question()
                 controller.frames[question_display.displayPage].load_question()
                 controller.show_frame(question_display.displayPage)
         

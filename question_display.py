@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 import random
-from json_utils import read_questions_from_file, write_questions_to_file
+from database import questions
 
 import home
 import help
+import question_input
 import feedback_correct
 import feedback_incorrect
 
@@ -15,16 +16,58 @@ MEDIUMBOLDFONT = ("Verdana", 20, "bold")
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
-
-questionList = read_questions_from_file()
+questions = None
 
 # Question Display Page -- where the questions and answer choices are displayed
 class displayPage(tk.Frame):
     current_question_index = 0
+    print(questions)
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
+        print(questions)
+        def load_question():
+
+            while questions and questions[displayPage.current_question_index]['status'] == 'TRUE':
+                displayPage.current_question_index = (displayPage.current_question_index + 1) % len(questions)
+
+            if questions:
+                current_question = questions[displayPage.current_question_index]
+                print(f"Loading question at index {displayPage.current_question_index}")
+                display_question_and_answers(current_question)
         
+        def display_question_and_answers(question):
+            question_text = question['question']
+            answers = [question['option_a'], question['option_b'], question['option_c']]
+            random.shuffle(answers)
+
+            self.question_label.config(text=question_text)
+            self.left_answer.config(text=answers[0])
+            self.front_answer.config(text=answers[1])
+            self.right_answer.config(text=answers[2])
+
+        def update_question_status(updated_question):
+            for q in question_input.questions:
+                if q['question'] == updated_question['question']:
+                    q['status'] = updated_question['status']
+                    break
+
+        def answer_question(user_answer):
+            current_question = question_input.questions[question_input.current_question_index]
+            correct_answer = current_question['correct_answer']
+            is_correct = user_answer == correct_answer
+
+            if is_correct:
+                current_question['status'] = 'TRUE'
+                update_question_status(current_question)
+                controller.frames[feedback_correct.feedbackCorrectPage].update_feedback(current_question, "CORRECT", correct_answer)
+                controller.show_frame(feedback_correct.feedbackCorrectPage)
+            else:
+                question_input.questions.append(question_input.questions.pop(question_input.current_question_index))
+                controller.frames[feedback_incorrect.feedbackIncorrectPage].update_feedback(current_question, "INCORRECT", correct_answer)
+                controller.show_frame(feedback_incorrect.feedbackIncorrectPage)
+
+        load_question()
+
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
@@ -83,54 +126,11 @@ class displayPage(tk.Frame):
 
         # Answer buttons
         self.leftBtn = ttk.Button(self, text="LEFT", style='btn.TButton',
-                                  command=lambda: self.answer_question(self.left_answer.cget("text")))
+                                  command=lambda: answer_question(self.left_answer.cget("text")))
         self.leftBtn.grid(row=5, column=0, columnspan=2)
         self.frontBtn = ttk.Button(self, text="FRONT", style='btn.TButton',
-                                   command=lambda: self.answer_question(self.front_answer.cget("text")))
+                                   command=lambda: answer_question(self.front_answer.cget("text")))
         self.frontBtn.grid(row=5, column=2, columnspan=2)
         self.rightBtn = ttk.Button(self, text="RIGHT", style='btn.TButton',
-                                   command=lambda: self.answer_question(self.right_answer.cget("text")))
+                                   command=lambda: answer_question(self.right_answer.cget("text")))
         self.rightBtn.grid(row=5, column=4, columnspan=2)
-
-        self.load_question()
-
-    def load_question(self):
-        while questionList[displayPage.current_question_index]['status'] == 'TRUE':
-            displayPage.current_question_index = (displayPage.current_question_index + 1) % len(questionList)
-
-        current_question = questionList[displayPage.current_question_index]
-        print(f"Loading question at index {displayPage.current_question_index}")
-        self.display_question_and_answers(current_question)
-
-    def display_question_and_answers(self, question):
-        question_text = question['question']
-        answers = [question['option_a'], question['option_b'], question['option_c']]
-        random.shuffle(answers)
-
-        self.question_label.config(text=question_text)
-        self.left_answer.config(text=answers[0])
-        self.front_answer.config(text=answers[1])
-        self.right_answer.config(text=answers[2])
-
-    def update_question_status(self, updated_question):
-        questions = read_questions_from_file()
-        for q in questions:
-            if q['question'] == updated_question['question']:
-                q['status'] = updated_question['status']
-                break
-        write_questions_to_file(questions)
-
-    def answer_question(self, user_answer):
-        current_question = questionList[displayPage.current_question_index]
-        correct_answer = current_question['correct_answer']
-        is_correct = user_answer == correct_answer
-
-        if is_correct:
-            current_question['status'] = 'TRUE'
-            self.update_question_status(current_question)
-            self.controller.frames[feedback_correct.feedbackCorrectPage].update_feedback(current_question, "CORRECT", correct_answer)
-            self.controller.show_frame(feedback_correct.feedbackCorrectPage)
-        else:
-            questionList.append(questionList.pop(displayPage.current_question_index))
-            self.controller.frames[feedback_incorrect.feedbackIncorrectPage].update_feedback(current_question, "INCORRECT", correct_answer)
-            self.controller.show_frame(feedback_incorrect.feedbackIncorrectPage)

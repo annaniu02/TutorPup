@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from json_utils import read_questions_from_file, write_questions_to_file
+from database import questions
 
 import home
 import help
@@ -12,10 +12,12 @@ MEDIUMFONT =("Verdana", 20)
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
+
+questions = []
+
 # Question Input Page -- where user can add their questions and answers
 class inputPage(tk.Frame):
     def __init__(self, parent, controller):
-
         # Function to add user input question-answers to the database when ADD button is clicked
         def addToDatabase():
             question = q_entry.get()
@@ -31,8 +33,6 @@ class inputPage(tk.Frame):
             elif correct_answer == 'C':
                 correct_answer_text = answer_c
             
-            questions = read_questions_from_file()
-
             data = {
                 "question": question,
                 "option_a": answer_a,
@@ -43,7 +43,7 @@ class inputPage(tk.Frame):
             }
 
             questions.append(data)
-            write_questions_to_file(questions)
+            
             
             # Clear the entries after getting their values
             q_entry.delete(0, tk.END)
@@ -53,8 +53,8 @@ class inputPage(tk.Frame):
             correct_entry.delete(0, tk.END)
 
 
-            print("Question added:", data)  
-
+            print("Question added:", data) 
+            print("Questions list:", questions)
 
 
         tk.Frame.__init__(self, parent)
@@ -137,3 +137,6 @@ class inputPage(tk.Frame):
         doneBtn = ttk.Button(self, text ="DONE", style = 'btn.TButton',
                                 command = lambda : controller.show_frame(question_display.displayPage))
         doneBtn.grid(row = 6, column = 3, columnspan = 3, rowspan = 1)
+
+def getDatabase():
+    return questions

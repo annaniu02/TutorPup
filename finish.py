@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from json_utils import read_questions_from_file, write_questions_to_file
 
 import home
 import help
@@ -104,25 +103,19 @@ class finishPage(tk.Frame):
         replayBtn.grid(row = 5, column = 3, columnspan = 3, rowspan = 1)
 
     def resetDatabase(self):
-        questions = read_questions_from_file()
-        if questions:
-            questions_to_keep = [questions[0]]  # Keep only the first question
-            questions_to_keep[0]['status'] = 'FALSE'
-            write_questions_to_file(questions_to_keep)
-            print("Database reset. Only the first row is kept.")
-        else:
-            print("No questions found in the JSON file.")
+        if question_display.displayPage.questions:
+            question_display.displayPage.questions = []
 
+        print(len(question_display.displayPage.questions))
+        question_display.displayPage.current_question_index = 0
         self.controller.show_frame(question_input.inputPage)
             
     # TODO: replay database
     def replayDatabase(self):
-        questions = read_questions_from_file()
-        for question in questions:
+        for question in question_display.displayPage.questions:
             question['status'] = 'FALSE'
-        write_questions_to_file(questions)
-        print(question_display.displayPage.current_question_index)
         question_display.displayPage.current_question_index = 0
-        print(question_display.displayPage.current_question_index)
+        print(question_display.displayPage.questions)
         self.controller.frames[question_display.displayPage].load_question()
         self.controller.show_frame(question_display.displayPage)
+        
