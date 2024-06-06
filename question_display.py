@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import random
-from database import questions
+from database import shared_list, add_item, remove_item, get_list
 
 import home
 import help
@@ -16,17 +16,17 @@ MEDIUMBOLDFONT = ("Verdana", 20, "bold")
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
-questions = None
+questions = get_list()
+
 
 # Question Display Page -- where the questions and answer choices are displayed
 class displayPage(tk.Frame):
     current_question_index = 0
-    print(questions)
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        print(questions)
+        
+        
         def load_question():
-
             while questions and questions[displayPage.current_question_index]['status'] == 'TRUE':
                 displayPage.current_question_index = (displayPage.current_question_index + 1) % len(questions)
 
@@ -34,25 +34,27 @@ class displayPage(tk.Frame):
                 current_question = questions[displayPage.current_question_index]
                 print(f"Loading question at index {displayPage.current_question_index}")
                 display_question_and_answers(current_question)
+
         
         def display_question_and_answers(question):
             question_text = question['question']
             answers = [question['option_a'], question['option_b'], question['option_c']]
             random.shuffle(answers)
 
+            print(question_text)
             self.question_label.config(text=question_text)
             self.left_answer.config(text=answers[0])
             self.front_answer.config(text=answers[1])
             self.right_answer.config(text=answers[2])
 
         def update_question_status(updated_question):
-            for q in question_input.questions:
+            for q in questions:
                 if q['question'] == updated_question['question']:
                     q['status'] = updated_question['status']
                     break
 
         def answer_question(user_answer):
-            current_question = question_input.questions[question_input.current_question_index]
+            current_question = questions[displayPage.current_question_index]
             correct_answer = current_question['correct_answer']
             is_correct = user_answer == correct_answer
 
@@ -62,11 +64,11 @@ class displayPage(tk.Frame):
                 controller.frames[feedback_correct.feedbackCorrectPage].update_feedback(current_question, "CORRECT", correct_answer)
                 controller.show_frame(feedback_correct.feedbackCorrectPage)
             else:
-                question_input.questions.append(question_input.questions.pop(question_input.current_question_index))
+                add_item(questions.pop(displayPage.current_question_index))
                 controller.frames[feedback_incorrect.feedbackIncorrectPage].update_feedback(current_question, "INCORRECT", correct_answer)
                 controller.show_frame(feedback_incorrect.feedbackIncorrectPage)
 
-        load_question()
+
 
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -134,3 +136,9 @@ class displayPage(tk.Frame):
         self.rightBtn = ttk.Button(self, text="RIGHT", style='btn.TButton',
                                    command=lambda: answer_question(self.right_answer.cget("text")))
         self.rightBtn.grid(row=5, column=4, columnspan=2)
+
+        def tkraise_wrapper(aboveThis=None):
+            load_question()
+            tk.Frame.tkraise(self, aboveThis)
+
+        self.tkraise = tkraise_wrapper

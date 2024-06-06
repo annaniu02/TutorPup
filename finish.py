@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from database import shared_list, add_item, remove_item, get_list, reset_database
 
 import home
 import help
@@ -19,29 +20,23 @@ class finishPage(tk.Frame):
         self.controller = controller
 
         # TODO: reset database
-        # def resetDatabase():
-        #     questions = read_questions_from_file()
-        #     if questions:
-        #         questions_to_keep = [questions[0]]
-        #         questions_to_keep[0]['status'] = 'FALSE'
-        #         write_questions_to_file(questions_to_keep)
-        #         print("Database reset. Only the first row is kept.")
-        #     else:
-        #         print("No questions found in the JSON file.")
+        def resetDatabase():
 
-        #     controller.show_frame(question_input.inputPage)
+            shared_list.clear()
+
+            print(f"length of question list: {len(shared_list)}")
+            question_display.displayPage.current_question_index = 0
+            controller.show_frame(question_input.inputPage)
             
         # TODO: replay database
-        # def replayDatabase():
-        #     questions = read_questions_from_file()
-        #     for question in questions:
-        #         question['status'] = 'FALSE'
-        #     write_questions_to_file(questions)
-        #     print(question_display.displayPage.current_question_index)
-        #     question_display.displayPage.current_question_index = 0
-        #     print(question_display.displayPage.current_question_index)
-        #     # controller.frames[question_display.displayPage].load_question()
-        #     controller.show_frame(question_display.displayPage)
+        def replayDatabase():
+            for question in shared_list:
+                question['status'] = 'FALSE'
+
+            print(f"before: {question_display.displayPage.current_question_index}")
+            question_display.displayPage.current_question_index = 0
+            print(f"after: {question_display.displayPage.current_question_index}")
+            self.controller.show_frame(question_display.displayPage)
 
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -92,30 +87,13 @@ class finishPage(tk.Frame):
         # TODO: after RESET button clicked, database should be cleared
         # TODO: do we want screen where user can review questions currently in database?
         resetBtn = ttk.Button(self, text ="RESET", style = 'btn.TButton',
-                                command = self.resetDatabase)
+                                command = resetDatabase)
         resetBtn.grid(row = 5, column = 0, columnspan = 3, rowspan = 1)
 
         # Place REPLAY button to move to question display slides
         # TODO: connect this functionality to database
         # TODO: after REPLAY button clicked, all questions in database should be run through and answered again --> status of questions back to 'incorrect'
         replayBtn = ttk.Button(self, text ="REPLAY", style = 'btn.TButton',
-                                command = self.replayDatabase)
+                                command = replayDatabase)
         replayBtn.grid(row = 5, column = 3, columnspan = 3, rowspan = 1)
-
-    def resetDatabase(self):
-        if question_display.displayPage.questions:
-            question_display.displayPage.questions = []
-
-        print(len(question_display.displayPage.questions))
-        question_display.displayPage.current_question_index = 0
-        self.controller.show_frame(question_input.inputPage)
-            
-    # TODO: replay database
-    def replayDatabase(self):
-        for question in question_display.displayPage.questions:
-            question['status'] = 'FALSE'
-        question_display.displayPage.current_question_index = 0
-        print(question_display.displayPage.questions)
-        self.controller.frames[question_display.displayPage].load_question()
-        self.controller.show_frame(question_display.displayPage)
         

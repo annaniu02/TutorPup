@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
+
 import home
 import help
 import question_display
@@ -27,7 +28,7 @@ class feedbackIncorrectPage(tk.Frame):
         self.update_feedback = update_feedback
 
         def continue_to_next_question():
-            controller.frames[question_display.displayPage].load_question()
+            # controller.frames[question_display.displayPage].load_question()
             controller.show_frame(question_display.displayPage)
         
         # Configure grid layout

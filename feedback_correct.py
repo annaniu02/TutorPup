@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from database import shared_list, add_item, remove_item, get_list
 
 import home
 import help
@@ -29,12 +30,12 @@ class feedbackCorrectPage(tk.Frame):
 
        
         def continue_to_next_question():
-            if all(q['status'] == 'TRUE' for q in question_display.displayPage.questions):
+            if all(q['status'] == 'TRUE' for q in get_list()):
                 controller.show_frame(finish.finishPage)
             else:
                 # Load the next question
                 # question_display.displayPage.load_question()
-                controller.frames[question_display.displayPage].load_question()
+                # controller.frames[question_display.displayPage].load_question()
                 controller.show_frame(question_display.displayPage)
         
         

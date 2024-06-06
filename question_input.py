@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from database import questions
+from database import shared_list, add_item, remove_item, get_list
 
 import home
 import help
@@ -13,7 +13,6 @@ SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
 
-questions = []
 
 # Question Input Page -- where user can add their questions and answers
 class inputPage(tk.Frame):
@@ -42,7 +41,7 @@ class inputPage(tk.Frame):
                 "status": "FALSE"
             }
 
-            questions.append(data)
+            add_item(data)
             
             
             # Clear the entries after getting their values
@@ -54,7 +53,7 @@ class inputPage(tk.Frame):
 
 
             print("Question added:", data) 
-            print("Questions list:", questions)
+            print("Questions list:", get_list())
 
 
         tk.Frame.__init__(self, parent)
@@ -138,5 +137,5 @@ class inputPage(tk.Frame):
                                 command = lambda : controller.show_frame(question_display.displayPage))
         doneBtn.grid(row = 6, column = 3, columnspan = 3, rowspan = 1)
 
-def getDatabase():
-    return questions
+# def getDatabase():
+#     return questions
