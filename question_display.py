@@ -18,15 +18,6 @@ BTNFONT =("Verdana", 35)
 
 questionList = read_questions_from_file()
 
-current_question = None
-
-question_text = None
-answer_one = None
-answer_two = None
-answer_three = None
-
-answer_to_sensor = None
-
 # Question Display Page -- where the questions and answer choices are displayed
 class displayPage(tk.Frame):
     current_question_index = 0
@@ -104,30 +95,17 @@ class displayPage(tk.Frame):
         self.load_question()
 
     def load_question(self):
-        print(f"Loading question at index {displayPage.current_question_index}")
         while questionList[displayPage.current_question_index]['status'] == 'TRUE':
             displayPage.current_question_index = (displayPage.current_question_index + 1) % len(questionList)
 
         current_question = questionList[displayPage.current_question_index]
+        print(f"Loading question at index {displayPage.current_question_index}")
         self.display_question_and_answers(current_question)
 
     def display_question_and_answers(self, question):
-        global question_text
         question_text = question['question']
         answers = [question['option_a'], question['option_b'], question['option_c']]
         random.shuffle(answers)
-
-        global answer_one, answer_two, answer_three
-        answer_one = answers[0]
-        answer_two = answers[1]
-        answer_three = answers[2]
-
-        global answer_to_sensor
-        answer_to_sensor = {
-            'Left': answers[0],
-            'Front': answers[1],
-            'Right': answers[2]
-        }
 
         self.question_label.config(text=question_text)
         self.left_answer.config(text=answers[0])
