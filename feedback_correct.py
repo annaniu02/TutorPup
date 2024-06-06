@@ -1,12 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
-from json_utils import read_questions_from_file, write_questions_to_file
+from database import shared_list, add_item, remove_item, get_list
 
 import home
 import help
 import question_display
 import question_input
-import question_display
 import finish
 
 HEADERFONT = ("Verdana", 40)
@@ -15,10 +14,30 @@ MEDIUMFONT =("Verdana", 20)
 SMALLFONT =("Verdana", 15)
 BTNFONT =("Verdana", 35)
 
+questionList = None
 # Feedback Page -- once user answer question by pressing corresponding sensor, this page displays to say if answer is right or wrong
-class feedbackPage(tk.Frame):
+class feedbackCorrectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        
+
+        def update_feedback(question, feedback, correct_answer):
+            question_label.config(text=question['question'])
+            feedback_label.config(text=feedback)
+            correction.config(text=f"Correct Answer is: {correct_answer}")
+        
+        self.update_feedback = update_feedback
+
+       
+        def continue_to_next_question():
+            if all(q['status'] == 'TRUE' for q in get_list()):
+                controller.show_frame(finish.finishPage)
+            else:
+                # Load the next question
+                # question_display.displayPage.load_question()
+                # controller.frames[question_display.displayPage].load_question()
+                controller.show_frame(question_display.displayPage)
+        
         
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -52,67 +71,28 @@ class feedbackPage(tk.Frame):
         helpBtn.grid(row = 0, column = 5, padx = 10, pady = 10, sticky = tk.NE)
 
         # label of header
-        self.question_label = ttk.Label(self, text ="[display question here]",
+        question_label = ttk.Label(self, text ="[display question here]",
                           font = LARGEFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
         # putting the grid in its place by using grid
-        self.question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
+        question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
 
         # TODO: this should change depending on if the correct sensor was pressed or not
-        self.feedback = ttk.Label(self, text ="CORRECT/INCORRECT",
+        feedback_label = ttk.Label(self, text ="CORRECT/INCORRECT",
                              font = HEADERFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
         # putting the grid in its place by using grid
-        self.feedback.grid(row = 1, column = 0, columnspan = 6, rowspan = 2)
+        feedback_label.grid(row = 1, column = 0, columnspan = 6, rowspan = 2)
 
         # correction content
         # TODO: this should change depending on what the correct answer & associated sensor is
-        self.correction = ttk.Label(self, text ="Correct Answer is: [Left:________]",
+        correction = ttk.Label(self, text ="Correct Answer is:",
                                font = LARGEFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
-        self.correction.grid(row = 3, column = 0, columnspan = 6, rowspan = 2)
+        correction.grid(row = 3, column = 0, columnspan = 6, rowspan = 2)
         
         # Place CONTINUE button to move to next question display slide
         # TODO: normally should display next question, for now have it go to finish page
         continueBtn = ttk.Button(self, text ="CONTINUE", style = 'btn.TButton',
-                                command = lambda : controller.show_frame(finish.finishPage))
+                                command = continue_to_next_question)
         continueBtn.grid(row = 5, column = 0, columnspan = 6, rowspan = 1)
-    
-    def update_feedback(self, question, user_answer, selected_sensor):
-        correct_answer = question['correct_answer']
-        is_correct = user_answer == correct_answer
-
-        # Update question label
-        self.question_label.config(text=question['question'])
-
-        # Update feedback label
-        if is_correct:
-            self.feedback.config(text="CORRECT")
-            question['status'] = 'TRUE'
-            self.update_question_status(question)
-        else:
-            self.feedback.config(text="INCORRECT")
-
-
-        self.correction.config(text=f"Correct Answer is: [{selected_sensor}: {correct_answer}]")
-        self.current_question = question
-        self.is_correct = is_correct
-
-    def update_question_status(self, updated_question):
-        questions = read_questions_from_file()
-        for q in questions:
-            if q['question'] == updated_question['question']:
-                q['status'] = updated_question['status']
-                break
-        write_questions_to_file(questions)
-    
-    def continue_to_next_question(self):
-        if not self.is_correct:
-            # Rotate the question to the back if answered incorrectly
-            self.controller.frames[question_display].questions.append(
-                self.controller.frames[question_display].questions.pop(self.controller.frames[question_display].current_question_index)
-            )
-
-        # Load the next question
-        self.controller.frames[question_display].load_question()
-        self.controller.show_frame(question_display)
