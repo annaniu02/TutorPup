@@ -9,6 +9,11 @@ import question_input
 import feedback_correct
 import feedback_incorrect
 
+# imports for audio
+from gtts import gTTS
+import playsound as ps
+import time
+
 import threading
 
 import time
@@ -47,6 +52,8 @@ class displayPage(tk.Frame):
     current_question_index = 0
     controller_ = None  # controller for use outside of init
 
+    currentQuestion_ = None # to be used for audio thread
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
@@ -65,6 +72,7 @@ class displayPage(tk.Frame):
 
             if questions:
                 current_question = questions[displayPage.current_question_index]
+                displayPage.currentQuestion_ = current_question['question']
                 print(f"Loading question at index {displayPage.current_question_index}")
                 display_question_and_answers(current_question)
 
@@ -185,6 +193,8 @@ class displayPage(tk.Frame):
 
         self.tkraise = tkraise_wrapper
 
+        # Create an audio thread
+        self.audioThread = None
         # Create an sensor thread
         self.sensorThread = None
     
@@ -282,3 +292,46 @@ class displayPage(tk.Frame):
             self.after(100, self.checkThread)
         else:
             print("sensor thread done")
+
+    ###
+    # Name: textToAudio
+    # Purpose: Convert a string into audio
+    # @input  text (string that will be converted into an mp3 audio file)
+    # @return None
+    #####    
+    def textToAudio(self, text):
+        tts = gTTS(text=text, lang='en')	# Convert the text to speech
+        audioFile = "audio/question.mp3"	# Save audio as temp file
+        tts.save(audioFile)
+        ps.playsound(audioFile)
+    
+    ###
+    # Name: playAudioThread
+    # Purpose: Starts audio thread
+    # @input  None
+    # @return None
+    #####        
+    def playAudioThread(self):
+        # If an audio thread is currently running, don't start another thread
+        if self.audioThread and self.audioThread.is_alive():
+            # Wait for previous audio thread to finish
+            self.audioThread.join()
+        print("new audio thread created for question")
+        # Create an audio thread
+        self.audioThread = threading.Thread(target=self.textToAudio, args=(displayPage.currentQuestion_,))
+        self.audioThread.start()	# Begin audio thread
+        self.checkAudioThread()		# Check if audio thread completed
+    
+    ###
+    # Name: checkAudioThread
+    # Purpose: Checks if thread has closed
+    # @input  None
+    # @return None
+    #####        
+    def checkAudioThread(self):
+        # Check if audio thread alive
+        if self.audioThread and self.audioThread.is_alive():
+            # Schedule next check after 100 ms
+            self.after(100, self.checkAudioThread)
+        else:
+            print("welcome audio thread done")

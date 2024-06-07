@@ -106,6 +106,7 @@ class tkinterApp(tk.Tk):
             frame.playAudioThread()
         # Every time question display page accessed, wait for sensor input
         if isinstance(frame, displayPage):
+            frame.playAudioThread()
             frame.waitForSensorInputThread()
         # Every time correct page accessed, play barking audio
         if isinstance(frame, feedbackCorrectPage):
