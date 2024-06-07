@@ -5,6 +5,13 @@ from tkinter import *
 import question_input
 import help
 
+# imports for audio
+from gtts import gTTS
+import playsound as ps
+import time
+
+import threading
+
 HEADERFONT = ("Verdana", 45)
 LARGEFONT =("Verdana", 35)
 MEDIUMFONT =("Verdana", 25)
@@ -78,3 +85,51 @@ class homePage(tk.Frame):
         startBtn.grid(row = 2, column = 1, columnspan = 4, rowspan = 1)
 
         # TODO: Add photo of pupper dog
+
+        # Create an audio thread, then call the function to start it
+        self.audioThread = None
+        self.playAudioThread()
+        
+            
+    ###
+    # Name: textToAudio
+    # Purpose: Convert a string into audio
+    # @input  text (string that will be converted into an mp3 audio file)
+    # @return None
+    #####    
+    def textToAudio(self, text):
+        tts = gTTS(text=text, lang='en')	# Convert the text to speech
+        audioFile = "audio/welcomeAudio.mp3"	# Save audio as temp file
+        tts.save(audioFile)
+        ps.playsound(audioFile)
+    
+    ###
+    # Name: playAudioThread
+    # Purpose: Starts audio thread
+    # @input  None
+    # @return None
+    #####        
+    def playAudioThread(self):
+        # If an audio thread is currently running, don't start another thread
+        if self.audioThread and self.audioThread.is_alive():
+            # Wait for previous audio thread to finish
+            self.audioThread.join()
+        print("new audio thread created for welcome")
+        # Create an audio thread
+        self.audioThread = threading.Thread(target=self.textToAudio, args=("Welcome to TutorPup, your favorite study pal!",))
+        self.audioThread.start()	# Begin audio thread
+        self.checkAudioThread()		# Check if audio thread completed
+    
+    ###
+    # Name: checkAudioThread
+    # Purpose: Checks if thread has closed
+    # @input  None
+    # @return None
+    #####        
+    def checkAudioThread(self):
+        # Check if audio thread alive
+        if self.audioThread and self.audioThread.is_alive():
+            # Schedule next check after 100 ms
+            self.after(100, self.checkAudioThread)
+        else:
+            print("welcome audio thread done")

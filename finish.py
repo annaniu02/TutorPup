@@ -7,6 +7,12 @@ import help
 import question_display
 import question_input
 
+# imports for audio
+import playsound as ps
+import time
+
+import threading
+
 HEADERFONT = ("Verdana", 40)
 LARGEFONT =("Verdana", 30)
 MEDIUMFONT =("Verdana", 20)
@@ -96,4 +102,49 @@ class finishPage(tk.Frame):
         replayBtn = ttk.Button(self, text ="REPLAY", style = 'btn.TButton',
                                 command = replayDatabase)
         replayBtn.grid(row = 5, column = 3, columnspan = 3, rowspan = 1)
+
+
+        # Create an audio thread
+        self.audioThread = None        
+            
+    ###
+    # Name: textToAudio
+    # Purpose: Convert a string into audio
+    # @input  text (string that will be converted into an mp3 audio file)
+    # @return None
+    #####  
+    def textToAudio(self):
+        audioFile = "audio/congratulations.mp3"
+        ps.playsound(audioFile)
+     
+    ###
+    # Name: playAudioThread
+    # Purpose: Starts audio thread
+    # @input  None
+    # @return None
+    #####      
+    def playAudioThread(self):
+        # If an audio thread is currently running, don't start another thread
+        if self.audioThread and self.audioThread.is_alive():
+            # Wait for previous audio thread to finish
+            self.audioThread.join()
+        print("new audio thread created for congratulatory audio")
+        # Create an audio thread
+        self.audioThread = threading.Thread(target=self.textToAudio, args=())
+        self.audioThread.start()	# Begin audio thread
+        self.checkAudioThread()		# Check if audio thread completed
+    
+    ###
+    # Name: checkAudioThread
+    # Purpose: Checks if thread has closed
+    # @input  None
+    # @return None
+    #####      
+    def checkAudioThread(self):
+        # Check if audio thread alive
+        if self.audioThread and self.audioThread.is_alive():
+            # Schedule next check after 100 ms
+            self.after(100, self.checkAudioThread)
+        else:
+            print("congratulatory audio thread done")
         

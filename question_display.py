@@ -9,6 +9,29 @@ import question_input
 import feedback_correct
 import feedback_incorrect
 
+import threading
+
+import time
+import RPi.GPIO as GPIO
+
+
+# There are 4 areas for touch actions
+# Each GPIO to each touch area
+touchPin_Front = 6
+touchPin_Left  = 3
+touchPin_Right = 16
+touchPin_Back  = 2
+
+# Use GPIO number but not PIN number
+GPIO.setmode(GPIO.BCM)
+
+# Set up GPIO numbers to input
+GPIO.setup(touchPin_Front, GPIO.IN)
+GPIO.setup(touchPin_Left,  GPIO.IN)
+GPIO.setup(touchPin_Right, GPIO.IN)
+GPIO.setup(touchPin_Back,  GPIO.IN)
+
+
 HEADERFONT = ("Verdana", 40)
 LARGEFONT =("Verdana", 30)
 MEDIUMFONT =("Verdana", 20)
@@ -22,10 +45,20 @@ questions = get_list()
 # Question Display Page -- where the questions and answer choices are displayed
 class displayPage(tk.Frame):
     current_question_index = 0
+    controller_ = None  # controller for use outside of init
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
+        print("inside the sensor constructor")
+        displayPage.controller_ = controller  # instantiate controller_
         
+        ###
+        # Name: load_question
+        # Purpose: Load the questions from question deck, and display the current question if it exists
+        # @input  None
+        # @return None
+        #####
         def load_question():
             while questions and questions[displayPage.current_question_index]['status'] == 'TRUE':
                 displayPage.current_question_index = (displayPage.current_question_index + 1) % len(questions)
@@ -35,7 +68,12 @@ class displayPage(tk.Frame):
                 print(f"Loading question at index {displayPage.current_question_index}")
                 display_question_and_answers(current_question)
 
-        
+        ###
+        # Name: display_question_and_answers
+        # Purpose: Displays current question in deck, as well as its answer options
+        # @input  question (The question being asked to the user)
+        # @return None
+        #####
         def display_question_and_answers(question):
             question_text = question['question']
             answers = [question['option_a'], question['option_b'], question['option_c']]
@@ -47,6 +85,7 @@ class displayPage(tk.Frame):
             self.front_answer.config(text=answers[1])
             self.right_answer.config(text=answers[2])
 
+        '''
         def update_question_status(updated_question):
             for q in questions:
                 if q['question'] == updated_question['question']:
@@ -67,6 +106,7 @@ class displayPage(tk.Frame):
                 add_item(questions.pop(displayPage.current_question_index))
                 controller.frames[feedback_incorrect.feedbackIncorrectPage].update_feedback(current_question, "INCORRECT", correct_answer)
                 controller.show_frame(feedback_incorrect.feedbackIncorrectPage)
+        '''
 
 
 
@@ -126,6 +166,7 @@ class displayPage(tk.Frame):
                                  background='#f9cb9c', font=LARGEFONT, anchor="center")
         instructions.grid(row=4, column=0, columnspan=6, rowspan=1)
 
+        '''
         # Answer buttons
         self.leftBtn = ttk.Button(self, text="LEFT", style='btn.TButton',
                                   command=lambda: answer_question(self.left_answer.cget("text")))
@@ -136,9 +177,108 @@ class displayPage(tk.Frame):
         self.rightBtn = ttk.Button(self, text="RIGHT", style='btn.TButton',
                                    command=lambda: answer_question(self.right_answer.cget("text")))
         self.rightBtn.grid(row=5, column=4, columnspan=2)
+        '''
 
         def tkraise_wrapper(aboveThis=None):
             load_question()
             tk.Frame.tkraise(self, aboveThis)
 
         self.tkraise = tkraise_wrapper
+
+        # Create an sensor thread
+        self.sensorThread = None
+    
+    ###
+    # Name: update_question_status
+    # Purpose: Updates the status of the updated_question
+    # @input  updated_question (The question whose status needs to be updated)
+    # @return None
+    #####     
+    def update_question_status(self, updated_question):
+        for q in questions:
+            if q['question'] == updated_question['question']:
+                q['status'] = updated_question['status']
+                break
+                    
+    ###
+    # Name: answer_question
+    # Purpose: Handles user response from touch sensor, then navigates to appropriate feedback page
+    # @input  user_answer (The answer corresponding to the sensor that the user selected)
+    # @return None
+    ##### 
+    def answer_question(self, user_answer):
+        current_question = questions[displayPage.current_question_index]
+        correct_answer = current_question['correct_answer']
+        is_correct = user_answer == correct_answer
+
+        if is_correct:
+            current_question['status'] = 'TRUE'
+            self.update_question_status(current_question)
+            displayPage.controller_.frames[feedback_correct.feedbackCorrectPage].update_feedback(current_question, "CORRECT", correct_answer)
+            displayPage.controller_.show_frame(feedback_correct.feedbackCorrectPage)
+        else:
+            add_item(questions.pop(displayPage.current_question_index))
+            displayPage.controller_.frames[feedback_incorrect.feedbackIncorrectPage].update_feedback(current_question, "INCORRECT", correct_answer)
+            displayPage.controller_.show_frame(feedback_incorrect.feedbackIncorrectPage)
+    
+    
+    ###
+    # Name: receiveSensor
+    # Purpose: Detects when user touches a sensor, then calls answer_question to process answer
+    # @input  None
+    # @return None
+    #####     
+    def receiveSensor(self):
+        while True:
+            # Read the state of the touch sensors at the front, left, and right positions
+            self.touchValue_Front = GPIO.input(touchPin_Front)
+            self.touchValue_Left  = GPIO.input(touchPin_Left)
+            self.touchValue_Right = GPIO.input(touchPin_Right)
+                
+            if not self.touchValue_Left:
+                self.answer_question(self.left_answer.cget("text"))
+                print("user input: left sensor")
+                break
+            if not self.touchValue_Right:
+                self.answer_question(self.right_answer.cget("text"))
+                print("user input: right sensor")
+                break
+            if not self.touchValue_Front:
+                self.answer_question(self.front_answer.cget("text"))
+                print("user input: front")
+                break
+                
+            time.sleep(0.5)
+    
+    ###
+    # Name: waitForSensorInputThread
+    # Purpose: Starts thread for awaiting sensor input
+    # @input  None
+    # @return None
+    #####      
+    def waitForSensorInputThread(self):
+        print("inside the sensor thread")
+        # If a thread is currently running, don't start another thread
+        if self.sensorThread and self.sensorThread.is_alive():
+            # Wait for previous  thread to finish
+            self.sensorThread.join()
+        print("new sensor thread created for question input")
+        # Create a thread
+        self.sensorThread = threading.Thread(target=self.receiveSensor, args=())
+        self.sensorThread.start()	# Begin thread
+        self.checkThread()		# Check if thread completed
+    
+    
+    ###
+    # Name: checkThread
+    # Purpose: Checks if thread has closed
+    # @input  None
+    # @return None
+    #####       
+    def checkThread(self):
+        # Check if thread alive
+        if self.sensorThread and self.sensorThread.is_alive():
+            # Schedule next check after 100 ms
+            self.after(100, self.checkThread)
+        else:
+            print("sensor thread done")
