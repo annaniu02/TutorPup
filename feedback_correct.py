@@ -79,7 +79,7 @@ class feedbackCorrectPage(tk.Frame):
         # label of header
         question_label = ttk.Label(self, text ="[display question here]",
                           font = LARGEFONT, background = "#f9cb9c",
-                          width = 33, anchor="center")
+                          anchor="center")
         # putting the grid in its place by using grid
         question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
 
@@ -94,7 +94,7 @@ class feedbackCorrectPage(tk.Frame):
         # TODO: this should change depending on what the correct answer & associated sensor is
         correction = ttk.Label(self, text ="Correct Answer is:",
                                font = LARGEFONT, background = "#f9cb9c",
-                          width = 33, anchor="center")
+                               anchor="center")
         correction.grid(row = 3, column = 0, columnspan = 6, rowspan = 2)
         
         # Place CONTINUE button to move to next question display slide

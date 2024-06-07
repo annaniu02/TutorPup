@@ -150,7 +150,7 @@ class displayPage(tk.Frame):
 
         # Label of header
         self.question_label = ttk.Label(self, text="", font=LARGEFONT, background="#f9cb9c",
-                                        width=33, anchor="center")
+                                        anchor="center")
         self.question_label.grid(row=0, column=0, columnspan=6, rowspan=1)
 
         # Display answer choices randomly assigned to sensors [Left, Right, Front]
