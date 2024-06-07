@@ -6,6 +6,13 @@ import home
 import help
 import question_display
 
+# imports for audio
+from gtts import gTTS
+import playsound as ps
+import time
+
+import threading
+
 HEADERFONT = ("Verdana", 40)
 LARGEFONT =("Verdana", 30)
 MEDIUMFONT =("Verdana", 20)
@@ -17,7 +24,12 @@ BTNFONT =("Verdana", 35)
 # Question Input Page -- where user can add their questions and answers
 class inputPage(tk.Frame):
     def __init__(self, parent, controller):
-        # Function to add user input question-answers to the database when ADD button is clicked
+        ###
+        # Name: addToDatabase
+        # Purpose: Add user inputted question-answers to the database when ADD button is clicked
+        # @input  None
+        # @return None
+        ##### 
         def addToDatabase():
             question = q_entry.get()
             answer_a = a_entry.get()
@@ -136,6 +148,52 @@ class inputPage(tk.Frame):
         doneBtn = ttk.Button(self, text ="DONE", style = 'btn.TButton',
                                 command = lambda : controller.show_frame(question_display.displayPage))
         doneBtn.grid(row = 6, column = 3, columnspan = 3, rowspan = 1)
+
+        # Create an audio thread
+        self.audioThread = None
+    
+    ###
+    # Name: textToAudio
+    # Purpose: Convert a string into audio
+    # @input  text (string that will be converted into an mp3 audio file)
+    # @return None
+    #####    
+    def textToAudio(self, text):
+        tts = gTTS(text=text, lang='en')	# Convert the text to speech
+        audioFile = "audio/questionInputAudio.mp3"	# Save audio as temp file
+        tts.save(audioFile)
+        ps.playsound(audioFile)
+    
+    ###
+    # Name: playAudioThread
+    # Purpose: Starts audio thread
+    # @input  None
+    # @return None
+    #####     
+    def playAudioThread(self):
+        # If an audio thread is currently running, don't start another thread
+        if self.audioThread and self.audioThread.is_alive():
+            # Wait for previous audio thread to finish
+            self.audioThread.join()
+        print("new audio thread created for question input")
+        # Create an audio thread
+        self.audioThread = threading.Thread(target=self.textToAudio, args=("Input your questions and answer options!",))
+        self.audioThread.start()	# Begin audio thread
+        self.checkAudioThread()		# Check if audio thread completed
+    
+    ###
+    # Name: checkAudioThread
+    # Purpose: Checks if thread has closed
+    # @input  None
+    # @return None
+    #####     
+    def checkAudioThread(self):
+        # Check if audio thread alive
+        if self.audioThread and self.audioThread.is_alive():
+            # Schedule next check after 100 ms
+            self.after(100, self.checkAudioThread)
+        else:
+            print("welcome audio thread done")
 
 # def getDatabase():
 #     return questions
