@@ -1,3 +1,16 @@
+'''
+Filename: question_display.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file creates the GUI for the displayPage screen. It will display
+the current question at the top of the screen, the randomized answer options and their
+corresponding touch sensor assignments in the middle of the screen, and instructions
+for how to answer the question at the bottom of the screen. The question will be read
+out loud through the Pupper's speaker system.
+'''
+
 import tkinter as tk
 from tkinter import ttk
 import random
@@ -54,6 +67,12 @@ class displayPage(tk.Frame):
 
     currentQuestion_ = None # to be used for audio thread
 
+    ###
+	# Name: __init__(self, parent, controller)
+	# Purpose: This function will initialize the displayPage GUI screen
+	# @input: parent (The parent container), controller (The main application controller)
+	# @return: None
+	###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
@@ -77,7 +96,7 @@ class displayPage(tk.Frame):
                 display_question_and_answers(current_question)
 
         ###
-        # Name: display_question_and_answers
+        # Name: display_question_and_answers(question)
         # Purpose: Displays current question in deck, as well as its answer options
         # @input  question (The question being asked to the user)
         # @return None
@@ -187,6 +206,12 @@ class displayPage(tk.Frame):
         self.rightBtn.grid(row=5, column=4, columnspan=2)
         '''
 
+        ###
+        # Name: tkraise_wrapper(aboveThis=None)
+        # Purpose: This function calls load_question() every time the widget is raised.
+        # @input  aboveThis (The widget that the current widget should be raised above)
+        # @return None
+        #####    
         def tkraise_wrapper(aboveThis=None):
             load_question()
             tk.Frame.tkraise(self, aboveThis)
@@ -199,7 +224,7 @@ class displayPage(tk.Frame):
         self.sensorThread = None
     
     ###
-    # Name: update_question_status
+    # Name: update_question_status(self, updated_question)
     # Purpose: Updates the status of the updated_question
     # @input  updated_question (The question whose status needs to be updated)
     # @return None
@@ -211,7 +236,7 @@ class displayPage(tk.Frame):
                 break
                     
     ###
-    # Name: answer_question
+    # Name: answer_question(self, user_answer)
     # Purpose: Handles user response from touch sensor, then navigates to appropriate feedback page
     # @input  user_answer (The answer corresponding to the sensor that the user selected)
     # @return None
@@ -233,7 +258,7 @@ class displayPage(tk.Frame):
     
     
     ###
-    # Name: receiveSensor
+    # Name: receiveSensor(self)
     # Purpose: Detects when user touches a sensor, then calls answer_question to process answer
     # @input  None
     # @return None
@@ -261,7 +286,7 @@ class displayPage(tk.Frame):
             time.sleep(0.5)
     
     ###
-    # Name: waitForSensorInputThread
+    # Name: waitForSensorInputThread(self)
     # Purpose: Starts thread for awaiting sensor input
     # @input  None
     # @return None
@@ -280,7 +305,7 @@ class displayPage(tk.Frame):
     
     
     ###
-    # Name: checkThread
+    # Name: checkThread(self)
     # Purpose: Checks if thread has closed
     # @input  None
     # @return None
@@ -294,7 +319,7 @@ class displayPage(tk.Frame):
             print("sensor thread done")
 
     ###
-    # Name: textToAudio
+    # Name: textToAudio(self, text)
     # Purpose: Convert a string into audio
     # @input  text (string that will be converted into an mp3 audio file)
     # @return None
@@ -306,7 +331,7 @@ class displayPage(tk.Frame):
         ps.playsound(audioFile)
     
     ###
-    # Name: playAudioThread
+    # Name: playAudioThread(self)
     # Purpose: Starts audio thread
     # @input  None
     # @return None
@@ -323,7 +348,7 @@ class displayPage(tk.Frame):
         self.checkAudioThread()		# Check if audio thread completed
     
     ###
-    # Name: checkAudioThread
+    # Name: checkAudioThread(self)
     # Purpose: Checks if thread has closed
     # @input  None
     # @return None

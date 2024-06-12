@@ -1,3 +1,25 @@
+'''
+Filename: app.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file initializes frame objects for the different GUI
+screens in the TutorPup application, utilizing the Tkinter library.
+On start up, the homePage will be displayed.
+The background thread for idle blinking is initalized in this file.
+Audio and Touch Sensor Management threads are also initialized here.
+
+How to use:
+    Usage:
+	<open Terminal 1:>    
+    	python app.py
+
+    When Finished: terminate all running terminals
+    	<In Terminal 1:>
+    		<Ctrl-C>
+'''
+
 import tkinter as tk
 from tkinter import ttk
 from home import homePage
@@ -12,10 +34,10 @@ import threading
 import subprocess
 import time
 
-# image handling imports
+# Image handling imports
 from MangDang.mini_pupper.display import Display, BehaviorState
-from resizeimage import resizeimage  # library for image resizing
-from PIL import Image, ImageDraw, ImageFont # library for image manip.
+from resizeimage import resizeimage  # Library for image resizing
+from PIL import Image, ImageDraw, ImageFont # Library for image manip.
  
 LARGEFONT =("Verdana", 35)
 MEDIUMFONT =("Verdana", 25)
@@ -49,20 +71,24 @@ for img in all_images:
             imgOld = imgFile.convert("RGBA")
             imgFile = Image.new('RGBA', imgOld.size, (255, 255, 255))
 
-    # We likely also need to resize to the pupper LCD display size (320x240).
-    # Note, this is sometimes a little buggy, but you can get the idea. 
+    # Resize to the pupper LCD display size (320x240).
     width_size = (MAX_WIDTH / float(imgFile.size[0]))
     imgFile = resizeimage.resize_width(imgFile, MAX_WIDTH)
 
-    newFileLoc = 'images/' + img + 'RZ.png'   #rename as you like
+    newFileLoc = 'images/' + img + 'RZ.png'
     new_images.append(newFileLoc)
             
-    # now output it (super inefficient, but it is what it is)
+    # Now output it (super inefficient, but it is what it is)
     imgFile.save(newFileLoc, imgFile.format)
-  
+
+# Creating a class to represent the GUI application  
 class tkinterApp(tk.Tk):
-     
-    # __init__ function for class tkinterApp
+    ###
+	# Name: __init__(self, *args, **kwargs)
+	# Purpose: This function will initialize frame objects for the application
+	# @input: None
+	# @return: None
+	###
     def __init__(self, *args, **kwargs):
          
         # __init__ function for class Tk
@@ -93,8 +119,13 @@ class tkinterApp(tk.Tk):
   
         self.show_frame(homePage)
   
-    # to display the current frame passed as
-    # parameter
+    ###
+	# Name: show_frame(self, cont)
+	# Purpose: This function will display the current frame passed as a parameter
+    #          and create an Audio/Touch Sensor Management thread if applicable to the frame.
+	# @input: cont (The frame to be displayed)
+	# @return: None
+	###
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
