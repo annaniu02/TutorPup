@@ -1,3 +1,17 @@
+'''
+Filename: finish.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file creates the GUI for the finish screen, which is shown
+once a question deck is complete (i.e. all questions have been answered
+correctly). It will have two prompts at the bottom: 'Reset' and 'Replay'.
+'Reset' allows users to input a new question deck.
+'Replay' allows users to redo the existing question deck.
+The audio/congratualtory.mp3 audio will play when this screen appears.
+'''
+
 import tkinter as tk
 from tkinter import ttk
 from database import shared_list, add_item, remove_item, get_list, reset_database
@@ -21,28 +35,49 @@ BTNFONT =("Verdana", 35)
 
 # Finish Page -- once all questions have been answered correctly, can choose to either RESET (input new questions) or REPLAY (replay question deck)
 class finishPage(tk.Frame):
+    ###
+	# Name: __init__(self, parent, controller)
+	# Purpose: This function will initialize the finishPage GUI screen
+	# @input: parent (The parent container), controller (The main application controller)
+	# @return: None
+	###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        # TODO: reset database
+        ###
+        # Name: resetDatabase()
+        # Purpose: This function resets the database. It will show the question input page,
+        #          because this function is called when the 'Reset' option is selected.
+        # @input: None
+        # @return: None
+        ###
         def resetDatabase():
-
+            
+            # clear the database
             shared_list.clear()
 
             print(f"length of question list: {len(shared_list)}")
             question_display.displayPage.current_question_index = 0
-            controller.show_frame(question_input.inputPage)
+            controller.show_frame(question_input.inputPage)     # show the question input GUI screen
             
-        # TODO: replay database
+        ###
+        # Name: replayDatabase()
+        # Purpose: This function allows users to replay the current question deck. It brings
+        #          users back to the question display page, because this function is called when
+        #          the 'Replay' option is selected.
+        # @input: None
+        # @return: None
+        ###
         def replayDatabase():
+            # for all questions in deck, revert status back to FALSE
             for question in shared_list:
                 question['status'] = 'FALSE'
 
             print(f"before: {question_display.displayPage.current_question_index}")
             question_display.displayPage.current_question_index = 0
             print(f"after: {question_display.displayPage.current_question_index}")
-            self.controller.show_frame(question_display.displayPage)
+            self.controller.show_frame(question_display.displayPage)    # show the question display GUI screen
 
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -89,16 +124,11 @@ class finishPage(tk.Frame):
         instructions.grid(row = 1, column = 0, columnspan = 6, rowspan = 4)
 
         # Place RESET button go back to question_input page
-        # TODO: connect this functionality to database
-        # TODO: after RESET button clicked, database should be cleared
-        # TODO: do we want screen where user can review questions currently in database?
         resetBtn = ttk.Button(self, text ="RESET", style = 'btn.TButton',
                                 command = resetDatabase)
         resetBtn.grid(row = 5, column = 0, columnspan = 3, rowspan = 1)
 
         # Place REPLAY button to move to question display slides
-        # TODO: connect this functionality to database
-        # TODO: after REPLAY button clicked, all questions in database should be run through and answered again --> status of questions back to 'incorrect'
         replayBtn = ttk.Button(self, text ="REPLAY", style = 'btn.TButton',
                                 command = replayDatabase)
         replayBtn.grid(row = 5, column = 3, columnspan = 3, rowspan = 1)
@@ -108,7 +138,7 @@ class finishPage(tk.Frame):
         self.audioThread = None        
             
     ###
-    # Name: textToAudio
+    # Name: textToAudio(self)
     # Purpose: Convert a string into audio
     # @input  text (string that will be converted into an mp3 audio file)
     # @return None
@@ -118,7 +148,7 @@ class finishPage(tk.Frame):
         ps.playsound(audioFile)
      
     ###
-    # Name: playAudioThread
+    # Name: playAudioThread(self)
     # Purpose: Starts audio thread
     # @input  None
     # @return None
@@ -135,7 +165,7 @@ class finishPage(tk.Frame):
         self.checkAudioThread()		# Check if audio thread completed
     
     ###
-    # Name: checkAudioThread
+    # Name: checkAudioThread(self)
     # Purpose: Checks if thread has closed
     # @input  None
     # @return None

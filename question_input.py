@@ -1,3 +1,16 @@
+'''
+Filename: question_input.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file creates the GUI for the inputPage screen. It will display
+the following fields for users to input: Question, Answer Options A-C, and Correct Answer.
+Once a user inputs these fields, they can click 'Add' to add the question to the deck.
+They can click 'Done' once they have finished entering in their questions. The
+audio/questionInputAudio.mp3 audio will play when this screen appears.
+'''
+
 import tkinter as tk
 from tkinter import ttk
 from database import shared_list, add_item, remove_item, get_list
@@ -23,6 +36,12 @@ BTNFONT =("Verdana", 35)
 
 # Question Input Page -- where user can add their questions and answers
 class inputPage(tk.Frame):
+    ###
+	# Name: __init__(self, parent, controller)
+	# Purpose: This function will initialize the inputPage GUI screen
+	# @input: parent (The parent container), controller (The main application controller)
+	# @return: None
+	###
     def __init__(self, parent, controller):
         ###
         # Name: addToDatabase
@@ -137,9 +156,6 @@ class inputPage(tk.Frame):
         correct_entry.grid(row=5, column=1, columnspan=4, padx=10, pady=10, sticky=tk.W+tk.E)
 
         # Place ADD button to add question to question deck
-        # TODO: connect this adding question functionality to database
-        # TODO: after ADD button clicked, entries should be stored in database and entry text box inputs should be cleared so user can input next questions/answers
-        # TODO: do we want screen where user can review questions currently in database?
         addBtn = ttk.Button(self, text ="ADD", style = 'btn.TButton',
                                 command = addToDatabase)
         addBtn.grid(row = 6, column = 0, columnspan = 3, rowspan = 1)
@@ -153,7 +169,7 @@ class inputPage(tk.Frame):
         self.audioThread = None
     
     ###
-    # Name: textToAudio
+    # Name: textToAudio(self, text)
     # Purpose: Convert a string into audio
     # @input  text (string that will be converted into an mp3 audio file)
     # @return None
@@ -165,7 +181,7 @@ class inputPage(tk.Frame):
         ps.playsound(audioFile)
     
     ###
-    # Name: playAudioThread
+    # Name: playAudioThread(self)
     # Purpose: Starts audio thread
     # @input  None
     # @return None
@@ -182,7 +198,7 @@ class inputPage(tk.Frame):
         self.checkAudioThread()		# Check if audio thread completed
     
     ###
-    # Name: checkAudioThread
+    # Name: checkAudioThread(self)
     # Purpose: Checks if thread has closed
     # @input  None
     # @return None

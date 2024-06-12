@@ -1,3 +1,17 @@
+'''
+Filename: home.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file creates the GUI for the homePage screen, which is shown
+at application start up. There is a Help icon in the upper right corner to navigate
+to the helpPage screen, and a Home icon in the upper left corner to naviaget back to this
+homePage screen. There is a Start button which navigates to the displayPage screen, which
+allows users to begin inputting questions. The audio/welcome.mp3 audio will play when this
+screen appears for the first time.
+'''
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
@@ -20,6 +34,12 @@ BTNFONT =("Verdana", 35)
 
 # Home Page -- first window frame startpage. Guides user to question_input page to begin adding questions
 class homePage(tk.Frame):
+    ###
+	# Name: __init__(self, parent, controller)
+	# Purpose: This function will initialize the homePage GUI screen
+	# @input: parent (The parent container), controller (The main application controller)
+	# @return: None
+	###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
@@ -84,15 +104,13 @@ class homePage(tk.Frame):
                                 command = lambda : controller.show_frame(question_input.inputPage))
         startBtn.grid(row = 2, column = 1, columnspan = 4, rowspan = 1)
 
-        # TODO: Add photo of pupper dog
-
         # Create an audio thread, then call the function to start it
         self.audioThread = None
         self.playAudioThread()
         
             
     ###
-    # Name: textToAudio
+    # Name: textToAudio(self, text)
     # Purpose: Convert a string into audio
     # @input  text (string that will be converted into an mp3 audio file)
     # @return None
@@ -104,7 +122,7 @@ class homePage(tk.Frame):
         ps.playsound(audioFile)
     
     ###
-    # Name: playAudioThread
+    # Name: playAudioThread(self)
     # Purpose: Starts audio thread
     # @input  None
     # @return None
@@ -121,7 +139,7 @@ class homePage(tk.Frame):
         self.checkAudioThread()		# Check if audio thread completed
     
     ###
-    # Name: checkAudioThread
+    # Name: checkAudioThread(self)
     # Purpose: Checks if thread has closed
     # @input  None
     # @return None

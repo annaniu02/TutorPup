@@ -1,3 +1,14 @@
+'''
+Filename: help.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file creates the GUI for the helpPage screen, which is shown
+when users select the "Help" icon. This pagee lists the instructions for how to use
+TutorPup.
+'''
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -11,6 +22,12 @@ BTNFONT =("Verdana", 35)
 
 # Help Page -- gives instructions on how to use the TutorPup
 class helpPage(tk.Frame):
+    ###
+	# Name: __init__(self, parent, controller)
+	# Purpose: This function will initialize the helpPage GUI screen
+	# @input: parent (The parent container), controller (The main application controller)
+	# @return: None
+	###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         

@@ -1,3 +1,16 @@
+'''
+Filename: feedback_incorrect.py
+Student: Anna Niu, Yuancheng 'Kaleo' Cao, Tracy Truong
+Email: afniu@ucsd.edu, yuc094@ucsd.edu, trtruong@ucsd.edu
+Final Project: TutorPup
+
+Description: This file creates the GUI for incorrect answer feedback.
+It will display the question at the top of the screen, the term "Incorrect"
+in the middle of the screen, and the correct answer at the bottom.
+There is a button to continue to the next question in the question deck.
+The audio/growling.mp3 audio will play when this screen appears.
+'''
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -23,9 +36,23 @@ BTNFONT =("Verdana", 35)
 questionList = None
 # Feedback Page -- once user answer question by pressing corresponding sensor, this page displays to say if answer is right or wrong
 class feedbackIncorrectPage(tk.Frame):
+    ###
+	# Name: __init__(self, parent, controller)
+	# Purpose: This function will initialize the feedbackIncorrectPage GUI screen
+	# @input: parent (The parent container), controller (The main application controller)
+	# @return: None
+	###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        ###
+        # Name: update_feedback(question, feedback, correct_answer)
+        # Purpose: This function will update the feedbackIncorrectPage GUI screen with
+        #          the current question, the feedback label, and the correct answer.
+        # @input: question (The current question), feedback (The feedback label: "INCORRECT"),
+        #         correct_answer (The current question's correct answer)
+        # @return: None
+        ###
         def update_feedback(question, feedback, correct_answer):
             question_label.config(text=question['question'])
             feedback_label.config(text=feedback)
@@ -33,6 +60,14 @@ class feedbackIncorrectPage(tk.Frame):
 
         self.update_feedback = update_feedback
 
+        ###
+        # Name: continue_to_next_question()
+        # Purpose: This function will load the next question if there are still questions
+        #          in the deck, but will proceed to the finishPage if all questions have been
+        #          answered correctly in the deck.
+        # @input: None
+        # @return: None
+        ###
         def continue_to_next_question():
             # controller.frames[question_display.displayPage].load_question()
             controller.show_frame(question_display.displayPage)
@@ -75,7 +110,7 @@ class feedbackIncorrectPage(tk.Frame):
         # putting the grid in its place by using grid
         question_label.grid(row = 0, column = 0, columnspan = 6, rowspan = 1)
 
-        # TODO: this should change depending on if the correct sensor was pressed or not
+        # feedback label indicates whether user got question CORRECT or INCORRECT
         feedback_label = ttk.Label(self, text ="CORRECT/INCORRECT",
                              font = HEADERFONT, background = "#f9cb9c",
                           width = 33, anchor="center")
@@ -83,14 +118,13 @@ class feedbackIncorrectPage(tk.Frame):
         feedback_label.grid(row = 1, column = 0, columnspan = 6, rowspan = 2)
 
         # correction content
-        # TODO: this should change depending on what the correct answer & associated sensor is
+        # displays the correct answer for the current question
         correction = ttk.Label(self, text ="Correct Answer is:",
                                font = LARGEFONT, background = "#f9cb9c",
                                anchor="center")
         correction.grid(row = 3, column = 0, columnspan = 6, rowspan = 2)
         
         # Place CONTINUE button to move to next question display slide
-        # TODO: normally should display next question, for now have it go to finish page
         continueBtn = ttk.Button(self, text ="CONTINUE", style = 'btn.TButton',
                                 command = continue_to_next_question)
         continueBtn.grid(row = 5, column = 0, columnspan = 6, rowspan = 1)
@@ -99,7 +133,7 @@ class feedbackIncorrectPage(tk.Frame):
         self.audioThread = None        
             
     ###
-    # Name: textToAudio
+    # Name: textToAudio(self)
     # Purpose: Convert a string into audio
     # @input  text (string that will be converted into an mp3 audio file)
     # @return None
@@ -109,7 +143,7 @@ class feedbackIncorrectPage(tk.Frame):
         ps.playsound(audioFile)
     
     ###
-    # Name: playAudioThread
+    # Name: playAudioThread(self)
     # Purpose: Starts audio thread
     # @input  None
     # @return None
@@ -126,7 +160,7 @@ class feedbackIncorrectPage(tk.Frame):
         self.checkAudioThread()		# Check if audio thread completed
     
     ###
-    # Name: checkAudioThread
+    # Name: checkAudioThread(self)
     # Purpose: Checks if thread has closed
     # @input  None
     # @return None
