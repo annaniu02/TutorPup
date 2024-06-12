@@ -1,5 +1,6 @@
 # TutorPup
 Final project for UCSD's CSE190/CSE276B Spring 2024 course.
+
 Professor: Laurel Riek
 
 ## About the Project
@@ -10,5 +11,7 @@ To run the program, run `python app.py` in your terminal.
 
 ## Contact
 Anna Niu: afniu@ucsd.edu
+
 Yuancheng 'Kaleo' Cao: yuc094@ucsd.edu
+
 Tracy Truong: trtruong@ucsd.edu
