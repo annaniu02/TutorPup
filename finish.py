@@ -36,11 +36,11 @@ BTNFONT =("Verdana", 35)
 # Finish Page -- once all questions have been answered correctly, can choose to either RESET (input new questions) or REPLAY (replay question deck)
 class finishPage(tk.Frame):
     ###
-	# Name: __init__(self, parent, controller)
-	# Purpose: This function will initialize the finishPage GUI screen
-	# @input: parent (The parent container), controller (The main application controller)
-	# @return: None
-	###
+    # Name: __init__(self, parent, controller)
+    # Purpose: This function will initialize the finishPage GUI screen
+    # @input: parent (The parent container), controller (The main application controller)
+    # @return: None
+    ###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller

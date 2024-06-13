@@ -35,11 +35,11 @@ BTNFONT =("Verdana", 35)
 # Home Page -- first window frame startpage. Guides user to question_input page to begin adding questions
 class homePage(tk.Frame):
     ###
-	# Name: __init__(self, parent, controller)
-	# Purpose: This function will initialize the homePage GUI screen
-	# @input: parent (The parent container), controller (The main application controller)
-	# @return: None
-	###
+    # Name: __init__(self, parent, controller)
+    # Purpose: This function will initialize the homePage GUI screen
+    # @input: parent (The parent container), controller (The main application controller)
+    # @return: None
+    ###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
