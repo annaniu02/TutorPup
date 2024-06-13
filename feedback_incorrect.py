@@ -134,8 +134,8 @@ class feedbackIncorrectPage(tk.Frame):
             
     ###
     # Name: textToAudio(self)
-    # Purpose: Convert a string into audio
-    # @input  text (string that will be converted into an mp3 audio file)
+    # Purpose: Play growling audio
+    # @input  None
     # @return None
     ##### 
     def textToAudio(self):
