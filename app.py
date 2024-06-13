@@ -17,7 +17,7 @@ How to use:
 
     When Finished: terminate all running terminals
     	<In Terminal 1:>
-    		<Ctrl-C>
+    	<Ctrl-C>
 '''
 
 import tkinter as tk
@@ -84,11 +84,11 @@ for img in all_images:
 # Creating a class to represent the GUI application  
 class tkinterApp(tk.Tk):
     ###
-	# Name: __init__(self, *args, **kwargs)
-	# Purpose: This function will initialize frame objects for the application
-	# @input: None
-	# @return: None
-	###
+    # Name: __init__(self, *args, **kwargs)
+    # Purpose: This function will initialize frame objects for the application
+    # @input: None
+    # @return: None
+    ###
     def __init__(self, *args, **kwargs):
          
         # __init__ function for class Tk
@@ -120,12 +120,12 @@ class tkinterApp(tk.Tk):
         self.show_frame(homePage)
   
     ###
-	# Name: show_frame(self, cont)
-	# Purpose: This function will display the current frame passed as a parameter
+    # Name: show_frame(self, cont)
+    # Purpose: This function will display the current frame passed as a parameter
     #          and create an Audio/Touch Sensor Management thread if applicable to the frame.
-	# @input: cont (The frame to be displayed)
-	# @return: None
-	###
+    # @input: cont (The frame to be displayed)
+    # @return: None
+    ###
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()

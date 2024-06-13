@@ -68,11 +68,11 @@ class displayPage(tk.Frame):
     currentQuestion_ = None # to be used for audio thread
 
     ###
-	# Name: __init__(self, parent, controller)
-	# Purpose: This function will initialize the displayPage GUI screen
-	# @input: parent (The parent container), controller (The main application controller)
-	# @return: None
-	###
+    # Name: __init__(self, parent, controller)
+    # Purpose: This function will initialize the displayPage GUI screen
+    # @input: parent (The parent container), controller (The main application controller)
+    # @return: None
+    ###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         

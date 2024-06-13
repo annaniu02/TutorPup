@@ -37,11 +37,11 @@ BTNFONT =("Verdana", 35)
 # Question Input Page -- where user can add their questions and answers
 class inputPage(tk.Frame):
     ###
-	# Name: __init__(self, parent, controller)
-	# Purpose: This function will initialize the inputPage GUI screen
-	# @input: parent (The parent container), controller (The main application controller)
-	# @return: None
-	###
+    # Name: __init__(self, parent, controller)
+    # Purpose: This function will initialize the inputPage GUI screen
+    # @input: parent (The parent container), controller (The main application controller)
+    # @return: None
+    ###
     def __init__(self, parent, controller):
         ###
         # Name: addToDatabase

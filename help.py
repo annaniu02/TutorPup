@@ -23,11 +23,11 @@ BTNFONT =("Verdana", 35)
 # Help Page -- gives instructions on how to use the TutorPup
 class helpPage(tk.Frame):
     ###
-	# Name: __init__(self, parent, controller)
-	# Purpose: This function will initialize the helpPage GUI screen
-	# @input: parent (The parent container), controller (The main application controller)
-	# @return: None
-	###
+    # Name: __init__(self, parent, controller)
+    # Purpose: This function will initialize the helpPage GUI screen
+    # @input: parent (The parent container), controller (The main application controller)
+    # @return: None
+    ###
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
